@@ -26,6 +26,8 @@ sampleList=" introsamples.AdPubAck
  introsamples.AsyncCacheRequest
  introsamples.BlockingSubscriber
  introsamples.DirectPubSub
+ introsamples.DirectPubSubServer
+ introsamples.DirectPubSubPublisher
  introsamples.DtoPubSub
  introsamples.EventMonitor
  introsamples.intro.HelloWorldPub 

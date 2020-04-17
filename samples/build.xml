@@ -12,8 +12,8 @@ Copyright 2006-2018 Solace Corporation. All rights reserved. </description>
 		</delete>
 		<mkdir dir="${basedir}/${output}"/>
         <javac  debug="true" 
-				source="1.5"
-	    		target="1.5"
+				source="1.8"
+	    		target="1.8"
         	    srcdir="${basedir}/src" 
         	    destdir="${basedir}/${output}" 
 				includeantruntime="false" 
