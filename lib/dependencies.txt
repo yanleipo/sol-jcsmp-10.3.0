@@ -1,0 +1,15 @@
+JCSMP API Dependencies
+
+To build/run JCSMP API based applications, the following jar files listed in lib directory 
+are needed:
+   commons-lang-2.6.jar
+   commons-logging-1.1.3.jar
+   sol-jcsmp-<version>.jar
+
+The jar files in lib/optional directory are packaged for convenience purposes, 
+they include files used for logging and debugging. They also include the legacy
+sol-common-<version>.jar of which contents have now been moved to sol-jcsmp-<version>.jar
+and is no longer needed.
+
+NOTICE: Including log4j-1.2.9.jar without a log4j.properties file on the classpath
+may impact program performance by turning the log level to DEBUG.
