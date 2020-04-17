@@ -23,7 +23,11 @@
 package com.solacesystems.jcsmp.samples.introsamples;
 
 import java.nio.ByteBuffer;
+import java.time.LocalDateTime;
 import java.lang.Runtime;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import com.solacesystems.jcsmp.BytesXMLMessage;
@@ -55,6 +59,8 @@ public class DirectPubSubPublisher extends SampleApp {
 	int longLatencyThresholdinMS = 100;
 	int longLatencyCount = 0;
 	int msgCount = 0;
+	int msgRate = 5;
+	boolean verbose = false;
 	
 	XMLMessageConsumer cons = null;
     XMLMessageProducer prod = null;    
@@ -69,7 +75,9 @@ public class DirectPubSubPublisher extends SampleApp {
 		System.out.println(strusage);
 	    System.out.println("Extra arguments for this sample:");
 	    System.out.println("\t -n \t the number of messages to publish (default " + msgNum + ")\n");
-	    System.out.println("\t -r \t long latency threshold in ms (default " + longLatencyThresholdinMS + ")\n");
+	    System.out.println("\t -lt \t long latency threshold in ms (default " + longLatencyThresholdinMS + ")\n");
+	    System.out.println("\t -r \t publish message rate (default " + msgRate + ")\n");
+	    System.out.println("\t -v \t verbose (default " + verbose + ")\n");
 	}
 
 	// The message handler is invoked for each Direct message received
@@ -96,11 +104,18 @@ public class DirectPubSubPublisher extends SampleApp {
 			//System.out.println("Received message:");
 			
 			long diff = System.currentTimeMillis() - msg.getAttachmentByteBuffer().getLong();
-			System.out.println("Round trip latency is: " + diff + "ms");
+			if(verbose)
+			{
+				System.out.println("Round trip latency is: " + diff + "ms");
+			}
+			
 			msgCount++;
 			if (diff > longLatencyThresholdinMS)
 			{
-				System.out.println("WARNING: Round trip latency is LONG: " + diff + "ms");
+			    Date date = new Date();
+			    DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			    String stringDate = sdf.format(date);
+				System.out.println("WARNING: Round trip latency is LONG: " + diff + "ms at " + stringDate);
 				longLatencyCount++;
 			}
 		}
@@ -136,8 +151,14 @@ public class DirectPubSubPublisher extends SampleApp {
 	       if (extraArguments.containsKey("-n")) {
 	    	   msgNum = Integer.parseInt(extraArguments.get("-n"));
 	       }
+	       if (extraArguments.containsKey("-lt")) {
+	    	   longLatencyThresholdinMS = Integer.parseInt(extraArguments.get("-lt"));
+	       }
 	       if (extraArguments.containsKey("-r")) {
-	    	   longLatencyThresholdinMS = Integer.parseInt(extraArguments.get("-r"));
+	    	   msgRate = Integer.parseInt(extraArguments.get("-r"));
+	       }
+	       if (extraArguments.containsKey("-v")) {
+	    	   verbose = true;
 	       }
 		
 		// Create a new Session. The Session properties are extracted from the
@@ -177,6 +198,11 @@ public class DirectPubSubPublisher extends SampleApp {
 	            properties.setProperty(JCSMPProperties.AUTHENTICATION_SCHEME, JCSMPProperties.AUTHENTICATION_SCHEME_GSS_KRB);   
 	        }
 
+	        // Customer parameters
+	        properties.setProperty(JCSMPProperties.PUB_ACK_WINDOW_SIZE, 255);
+	        properties.setBooleanProperty(JCSMPProperties.PUB_MULTI_THREAD, false);
+	        properties.setProperty(JCSMPProperties.ACK_EVENT_MODE, JCSMPProperties.SUPPORTED_ACK_EVENT_MODE_WINDOWED);
+	        
 	        // Channel properties
 	        JCSMPChannelProperties cp = (JCSMPChannelProperties) properties
 				.getProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES);
@@ -233,7 +259,7 @@ public class DirectPubSubPublisher extends SampleApp {
 
                 // Wait 1 second between messages. This also provides sufficient 
                 // time for the final message to be received.
-				Thread.sleep(200);
+				Thread.sleep(1000/msgRate);
 			}
 			
 			// Stop the consumer and remove the subscription.
